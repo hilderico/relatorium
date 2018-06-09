@@ -1,0 +1,140 @@
+			#thead_0 { display: table-header-group; }
+			#thead { page-break-before: always; }
+			#tbody { display: table-row-group; }
+			#tfoot { display: table-footer-group; }
+		
+			body {
+				padding:0px 20px 0px 20px;
+				font-family:Arial, sans-serif;
+				font-size:11px;
+        font-style:color-burn;
+			}
+						
+			.conteiner {
+				border:1px solid gray;
+				-webkit-border-radius: 8px;
+				border-radius: 8px;
+				padding:10px;
+				margin-bottom:10px;
+				page-break-inside: inherit;
+			}
+
+			.conteiner:hover{
+				background-color:#FFFF99;
+			}
+			
+			@media screen {
+				div.topo, div.rodape {
+					display: none;
+				}
+			}
+			
+			@media print {
+				div.topo {
+					position: fixed;
+					top: 0;
+				}
+				
+				div.rodape {
+					position: fixed;
+					bottom: 0;
+				}
+			}
+			
+			.grupo
+			{
+				font-size:14px;
+				font-weight: bold;
+				text-align:justify;
+				padding:5px;
+				background-color:#003366;
+				color:#fff;
+				margin-bottom:10px;
+			}
+			
+			.celula
+			{
+				font-family: Arial, 'Times New Roman';
+				font-size: 12px;
+			}
+			
+			.celula.Titem
+			{
+				font-weight: bold;
+				text-align:center;
+				padding:3px;
+				background-color:#003366;
+				color:#fff;
+				width:5%;
+				vertical-align:middle;
+			}
+				
+			.celula.Litem
+			{
+				text-align:center;
+				padding:3px;
+				width:5%;
+				vertical-align:top;
+				border-bottom:1px #000 solid;
+			}
+	
+			.celula.Tcodigo
+			{
+				font-weight: bold;
+				text-align:center;
+				padding:3px;
+				background-color:#003366;
+				color:#fff;
+				width:10%;
+				vertical-align:middle;
+			}
+				
+			.celula.Lcodigo
+			{
+				text-align:center;
+				padding:3px;
+				width:10%;
+				vertical-align:top;
+				border-bottom:1px #000 solid;
+			}
+
+			.celula.Tnome
+			{
+				font-weight: bold;
+				text-align:center;
+				padding:3px;
+				background-color:#003366;
+				color:#fff;
+				width:75%;
+				vertical-align:middle;
+			}
+				
+			.celula.Lnome
+			{
+				text-align:left;
+				padding:3px;
+				width:75%;
+				vertical-align:top;
+				border-bottom:1px #000 solid;
+			}
+
+			.celula.Tvalor
+			{
+				font-weight: bold;
+				text-align:center;
+				padding:3px;
+				background-color:#003366;
+				color:#fff;
+				width:10%;
+				vertical-align:middle;
+			}
+			
+							
+			.celula.Lvalor
+			{
+				text-align:right;
+				padding:3px;
+				width:10%;
+				vertical-align:top;
+				border-bottom:1px #000 solid;
+			}
