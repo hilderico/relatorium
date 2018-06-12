@@ -32,7 +32,10 @@ setlocale( LC_ALL, 'pt_BR', 'pt_BR.iso-8859-1', 'pt_BR.utf-8', 'portuguese' );
 
 // ------- by xboxslim788@gmail.com --------------
 
-$TableWidth = 554;
+// item, nome, valor, vencimento
+$cwidth = array(10,50,25,15);
+
+$TableWidth = 630;
 
 class YOURPDF extends TCPDF {
 
@@ -213,75 +216,44 @@ function FUN_cabecalho($idcoligada, $opc){
 function listaprodutos($idpedido, $item)
 {
   global $servername, $username, $password, $dbname;
+  global $cwidth;
   $link = mysqli_connect($servername, $username, $password, $dbname);
 
-	$sql = "SELECT A.ID, LPAD(A.IDPEDIDO, 5, '0') AS PEDIDO,
-		DATE_FORMAT(H.DATAPEDIDO, '%d/%m/%Y') AS DTPEDIDO,
-		H.IDCLIENTE, I.NOME AS CLIENTE, I.CPFCNPJ,
-		H.IDFORMAPAGTO, J.NOME AS FORMAPAGTO, H.DESCONTOGERAL,
-		CASE H.STATUSVENDA WHEN 1 THEN 'Pendente'
-		WHEN 2 THEN 'Pago'
-		WHEN 3 THEN 'Cancelado'
-		WHEN 4 THEN 'Fechado pela Nobre'
-		WHEN 5 THEN 'Fechado pelo Cliente'
-		ELSE '' END AS STATUSDAVENDA, H.OBSERVACAO,
-		A.IDPRODUTO, A.QUANTIDADE, B.CODIGO,
-		
-		CONCAT(
-        B.NOME,
-        CASE WHEN B.COMPLEMENTO IS NULL THEN ''
-        WHEN Trim(B.COMPLEMENTO) = '' THEN '' ELSE CONCAT(' ', B.COMPLEMENTO) END,
-        CASE WHEN B.TAMANHO IS NULL THEN ''
-        WHEN Trim(B.TAMANHO) = '' THEN '' ELSE CONCAT(' tam. ', B.TAMANHO) END,
-        CASE WHEN E.NOME IS NULL THEN ''
-        WHEN Trim(E.NOME) = '' THEN '' ELSE CONCAT(' de cor ', E.NOME) END,
-        CASE WHEN D.NOME IS NULL THEN ''
-        WHEN Trim(D.NOME) = '' THEN '' ELSE CONCAT(' da ', D.NOME) END
-        ) AS PRODUTO,
-		
-		ROUND(A.VALORUNITARIO, 2) AS VLRUNIT,
-		ROUND(A.DESCONTO, 2) AS DESCONTO, ROUND(A.VALORTOTAL, 2) AS VLTOTAL,
-		B.COMISSAO, B.FRETE, C.SIGLA AS UND, D.NOME AS MARCA, E.NOME AS COR,
-		F.NOME AS CATEGORIA, G.NOME AS SUBCATEGORIA, K.NOME AS TRANSPORTADORA,
-		(SELECT COUNT(*) FROM G002_CONDICOESPAGTO X WHERE X.IDFORMAPAGTO = H.IDFORMAPAGTO) AS PARCELAS
-		
-		FROM G004_DETALHEPEDIDO A
-		INNER JOIN E005_PRODUTOS B ON (B.ID = A.IDPRODUTO)
-		INNER JOIN E004_UNIDADE C ON (C.ID = B.IDUNIDADE)
-		INNER JOIN E003_MARCA D ON (D.ID = B.IDMARCA)
-		INNER JOIN E002_CORES E ON (E.ID = B.IDCOR)
-		INNER JOIN E001_CATEGORIAS F ON (F.ID = B.IDCATEGORIA)
-		INNER JOIN E001_CATEGORIAS G ON (G.ID = B.IDSUBCATEGORIA)
-		INNER JOIN G003_PEDIDO H ON (H.ID = A.IDPEDIDO)
-		INNER JOIN C001_PESSOAS I ON (I.ID = H.IDCLIENTE)
-		INNER JOIN G001_FORMAPAGTO J ON (J.ID = H.IDFORMAPAGTO)
-		LEFT JOIN C001_PESSOAS K ON (K.ID = H.IDTRANSPORTE)		
-    WHERE A.IDPEDIDO = $idpedido
-		ORDER BY A.ID";  
+	$sql = "SELECT A.ID, A.IDPEDIDO, C.NOME, A.VALORPAGO, A.VENCIMENTO, A.PARCELA,
+  case A.STATUSCONTA when 1 then 
+  'PENDENTE' 
+  when 2 then 
+  'PAGO' 
+  when 3 then 
+  'CANCELADO' 
+  else '' END as STATUSCONTA,
+YEAR(A.VENCIMENTO) AS ANO,
+MONTH(A.VENCIMENTO) AS MES
+
+FROM G006_CONTASRECEBER AS A 
+INNER JOIN G003_PEDIDO AS B ON (A.IDPEDIDO = B.ID) 
+INNER JOIN C001_PESSOAS AS C ON (B.IDCLIENTE = C.ID) where A.IDPEDIDO = " .$idpedido;  
   
   $fhtml = "";    
   $res = $link->query($sql);
   
 	$x = 0;
   
- 	$pedido = array();
+ 	$id = array();
+  $pedido = array();
 	$cliente = array();
 	$statusdavenda = array();
-	$produto = array();
-	$quantidade = array();
-	$vlrunit = array();
-	$vltotal = array();
+  $valorpago = array();
+  $vencimento = array();
 	
   
   while ($Dados = $res->fetch_assoc()) {
-  
-    $pedido[$x] = $Dados["PEDIDO"];
-		$cliente[$x] = $Dados["CLIENTE"];
-		$statusdavenda[$x] = $Dados["STATUSDAVENDA"];
-		$produto[$x] = $Dados["PRODUTO"];
-		$quantidade[$x] = $Dados["QUANTIDADE"];
-		$vlrunit[$x] = $Dados["VLRUNIT"];
-		$vltotal[$x] = $Dados["VLTOTAL"];		
+    $id[$x] = $Dados["ID"];
+    $pedido[$x] = $Dados["IDPEDIDO"];
+		$cliente[$x] = $Dados["NOME"];
+    $valorpago[$x] = $Dados["VALORPAGO"];
+    $vencimento[$x] = $Dados["VENCIMENTO"];;
+		$statusdavenda[$x] = $Dados["STATUSCONTA"];	
     
 		$x++;
 	}   
@@ -299,7 +271,25 @@ function listaprodutos($idpedido, $item)
 				padding:3px;
 				
 				color:#000;
-				width:10%;
+				width:'.$cwidth[0] .'%;
+        height: 50px;
+				vertical-align:middle;"';
+  
+   $celula_Lnome = ' style="font-weight: normal;
+				text-align: center;
+				padding:3px;
+				
+				color:#000;
+				width:'.$cwidth[1] .'%;
+        height: 50px;
+				vertical-align:middle;"';
+  
+  $celula_Lvalor = ' style="font-weight: normal;
+				text-align: right;
+				padding:3px;
+				
+				color:#000;
+				width:'.$cwidth[2] .'%;
         height: 50px;
 				vertical-align:middle;"';
   
@@ -309,40 +299,21 @@ function listaprodutos($idpedido, $item)
 				padding: 3px;
 				
 				color:#000;
-				width:11%;
+				width:'.$cwidth[3] .'%;
         height: 50px;
 				vertical-align: middle;"'; 
     
     
-  $celula_Lnome = ' style="font-weight: normal;
-				text-align: left;
-				padding:3px;
-				
-				color:#000;
-				width:65%;
-        height: 50px;
-				vertical-align:middle;"';
-    
-  $celula_Lvalor = ' style="font-weight: normal;
-				text-align: right;
-				padding:3px;
-				
-				color:#000;
-				width:14%;
-        height: 50px;
-				vertical-align:middle;"';
-  
-  
+ 
   
  
 	 for($x = 0; $x < $Cont; $x++){
     if($item % 2 == 0){ $fhtml .= '<tr'.$tr1.'>';} else { $fhtml .= '<tr'.$tr2.'>';} 
     $fhtml .= '
-					<td' .$celula_Litem .'>'.str_pad($item, 5, "0", STR_PAD_LEFT).'</td>					
-					<td' .$celula_Lnome .'>' .utf8_encode($produto[$x]).'</td>
-          <td' .$celula_Lvalor .'>R$ ' .number_format($vlrunit[$x],2,",",".").'</td>
-					<td' .$celula_Lcodigo . '>'.$quantidade[$x].'</td>
-          <td' .$celula_Lvalor .'>R$ ' .number_format($vltotal[$x],2,",",".").'</td>
+					<td' .$celula_Litem .'>'.$pedido[$x].'</td>					
+					<td' .$celula_Lnome .'>' .utf8_encode($cliente[$x]).'</td>         
+					<td' .$celula_Lcodigo . '>'. date('d/m/Y', strtotime($vencimento[$x])).'</td> 
+          <td' .$celula_Lvalor .'>R$ ' .number_format($valorpago[$x],2,",",".").'</td>
 				</tr>';
        $item++;
     }	
@@ -352,28 +323,37 @@ function listaprodutos($idpedido, $item)
   return $fhtml;
 }
 
-function listafornecedor()
+function listafornecedor($lid)
 {
   header('Content-Type: text/html; charset=utf-8');
   setlocale( LC_ALL, 'pt_BR', 'pt_BR.iso-8859-1', 'pt_BR.utf-8', 'portuguese' );
   $sql = "";
   global $servername, $username, $password, $dbname;
   global $TableWidth;
+  global $cwidth;
   $link = mysqli_connect($servername, $username, $password, $dbname);
   
   $fhtml = "";
+  $pID = $lid;
   
   //c9f0f895fb98ab9159f51fd0297e236d
   
  // if($_GET["pID"] == 0){
   
-    $sql .= "SELECT G3.ID, C1.NOME, CASE G3.STATUSVENDA WHEN 1 THEN 'Pendente'
-		WHEN 2 THEN 'Pago'
-		WHEN 3 THEN 'Cancelado'
-		WHEN 4 THEN 'Fechado pela Nobre'
-		WHEN 5 THEN 'Fechado pelo Cliente'
-		ELSE '' END AS STATUSDAVENDA FROM G003_PEDIDO as G3 
-inner join C001_PESSOAS as C1 on G3.IDCLIENTE = C1.ID";   
+    $sql = "SELECT A.ID, A.IDPEDIDO, C.NOME, A.VALORPAGO, A.VENCIMENTO, A.PARCELA,
+    case A.STATUSCONTA when 1 then 
+  'PENDENTE' 
+  when 2 then 
+  'PAGO' 
+  when 3 then 
+  'CANCELADO' 
+  else '' END as STATUSCONTA, 
+YEAR(A.VENCIMENTO) AS ANO,
+MONTH(A.VENCIMENTO) AS MES
+
+FROM G006_CONTASRECEBER AS A 
+INNER JOIN G003_PEDIDO AS B ON (A.IDPEDIDO = B.ID) 
+INNER JOIN C001_PESSOAS AS C ON (B.IDCLIENTE = C.ID) ";   
     
  // }else 
  // {
@@ -384,7 +364,9 @@ inner join C001_PESSOAS as C1 on G3.IDCLIENTE = C1.ID";
 	  ORDER BY NOME";
   */
  // }
+  $id = array();
   $pedido = array();
+  $md5_pedido = array();
 	$cliente = array();
 	$statusdavenda = array();
 	
@@ -394,16 +376,59 @@ inner join C001_PESSOAS as C1 on G3.IDCLIENTE = C1.ID";
 	$x = 0;
   while ($Dados = $res->fetch_assoc()) {
     		
-		$pedido[$x] = $Dados["ID"];
+		$pedido[$x] = $Dados["IDPEDIDO"];
+    $md5_pedido[$x] = md5($Dados["IDPEDIDO"]);
 		$cliente[$x] = $Dados["NOME"];
-		$statusdavenda[$x] = $Dados["STATUSDAVENDA"];	
+		$statusdavenda[$x] = $Dados["STATUSCONTA"];	
     
 		$x++;
 	} 
   
    $Cont = $x;
   //echo "Cont = " .$Cont;
+  for($x = 0; $x < $Cont; $x++){
+    if($pID == $md5_pedido[$x]){      
+      $foundpID = $pedido[$x];
+    }else
+    {
+       
+    }
+  }
   
+  $sql = "SELECT A.ID, A.IDPEDIDO, C.NOME, A.VALORPAGO, A.VENCIMENTO, A.PARCELA,
+    case A.STATUSCONTA when 1 then 
+  'PENDENTE' 
+  when 2 then 
+  'PAGO' 
+  when 3 then 
+  'CANCELADO' 
+  else '' END as STATUSCONTA, 
+YEAR(A.VENCIMENTO) AS ANO,
+MONTH(A.VENCIMENTO) AS MES
+
+FROM G006_CONTASRECEBER AS A 
+INNER JOIN G003_PEDIDO AS B ON (A.IDPEDIDO = B.ID) 
+INNER JOIN C001_PESSOAS AS C ON (B.IDCLIENTE = C.ID) where A.IDPEDIDO = " .$foundpID; 
+  
+  $id = array();
+  $pedido = array();
+  $md5_pedido = array();
+	$cliente = array();
+	$statusdavenda = array();
+	
+	
+  $res = $link->query($sql);
+  
+	$x = 0;
+  while ($Dados = $res->fetch_assoc()) {
+    		
+		$pedido[$x] = $Dados["IDPEDIDO"];
+    $md5_pedido[$x] = $Dados["IDPEDIDO"];
+		$cliente[$x] = $Dados["NOME"];
+		$statusdavenda[$x] = $Dados["STATUSCONTA"];	
+    
+		$x++;
+	}  
   
   
   $celula_Titem = ' style="font-weight:bold;
@@ -411,7 +436,23 @@ inner join C001_PESSOAS as C1 on G3.IDCLIENTE = C1.ID";
 				padding:3px;
 				background-color:#003366;
 				color:#fff;
-				width:10%;
+				width:'.$cwidth[0] .'%;
+				vertical-align:middle;"';
+  
+  $celula_Tnome = ' style="font-weight: bold;
+				text-align:center;
+				padding:3px;
+				background-color:#003366;
+				color:#fff;
+				width:'.$cwidth[1] .'%;
+				vertical-align:middle;"';
+  
+  $celula_Tvalor = ' style="font-weight: bold;
+				text-align:center;
+				padding:3px;
+				background-color:#003366;
+				color:#fff;
+				width:'.$cwidth[2] .'%;
 				vertical-align:middle;"';
   
    
@@ -420,42 +461,21 @@ inner join C001_PESSOAS as C1 on G3.IDCLIENTE = C1.ID";
 				padding: 3px;
 				background-color: #003366;
 				color: #fff;
-				width:11%;
-				vertical-align: middle;"'; 
+				width:'.$cwidth[3] .'%;
+				vertical-align: middle;"';    
     
-    
-  $celula_Tnome = ' style="font-weight: bold;
-				text-align:center;
-				padding:3px;
-				background-color:#003366;
-				color:#fff;
-				width:65%;
-				vertical-align:middle;"';
-    
-  $celula_Tvalor = ' style="font-weight: bold;
-				text-align:center;
-				padding:3px;
-				background-color:#003366;
-				color:#fff;
-				width:14%;
-				vertical-align:middle;"';
-  
-    
-    
-  
+   $fhtml .= '<h4 style="text-align: center;"> RELATÓRIO DE CLIENTES </h4>';
   
   for($x = 0; $x < $Cont; $x++){
   
-  $fhtml .= 'CLIENTE:' .utf8_encode($cliente[$x]) .' <br>PEDIDO: '
-    .$pedido[$x].'<br>STATUS DA VENDA: '.$statusdavenda[$x].'<br>
+  $fhtml .= '<b>Cliente:&nbsp;&nbsp;</b>' .utf8_encode($cliente[$x]) .'<br><b>Pedido:&nbsp;<b> '.$pedido[$x].'<br><b>Status da Venda:&nbsp;<b>'.$statusdavenda[$x].'<br>
 				<div style="padding-left:200px;">
 				<table width="'.$TableWidth.'" border="0" cellspacing="0" cellpadding="0">
-				  <tr>
-					<td' .$celula_Titem .'>ITEM</td>
-          <td' .$celula_Tnome .'>PRODUTO</td>
-          <td' .$celula_Tvalor .'>VALOR UNITÁRIO R$</td>
-					<td' .$celula_Tcodigo .'>QUANTIDADE </td>					
-					<td' .$celula_Tvalor .'>VALOR TOTAL R$</td>
+				  <tr>					
+          <td' .$celula_Titem .'>PEDIDO No.</td>
+          <td' .$celula_Tnome .'>CLIENTE</td>
+          <td' .$celula_Tcodigo .'>VENCIMENTO </td>	
+          <td' .$celula_Tvalor .'>VALOR A PAGAR R$</td>
 				  </tr>';    
           
           $item = 1;
@@ -571,7 +591,7 @@ $endereco = FUN_cabecalho($idcoligada, 3);
 
 
 
-$inhtml = listafornecedor();
+$inhtml = listafornecedor($_GET["pID"]);
 // debug echo $inhtml;
 //echo $inhtml;
   
@@ -727,7 +747,7 @@ $html = <<<EOD
 		</HEAD>
 		<BODY style='padding:20px;'>
 			
-			<div id='tbody'>$inhtml</div>
+			$inhtml
 			
 			<br>
 			<br>

@@ -317,7 +317,7 @@ function listaprodutos($idfornecedor, $item)
   return $fhtml;
 }
 
-function listafornecedor($id)
+function listafornecedor($lid)
 {
   header('Content-Type: text/html; charset=utf-8');
   setlocale( LC_ALL, 'pt_BR', 'pt_BR.iso-8859-1', 'pt_BR.utf-8', 'portuguese' );
@@ -326,7 +326,7 @@ function listafornecedor($id)
   $link = mysqli_connect($servername, $username, $password, $dbname);
   
   $fhtml = "";
-  $pID = $id;
+  $pID = $lid;
   
   //c9f0f895fb98ab9159f51fd0297e236d
   /*

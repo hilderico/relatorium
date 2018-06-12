@@ -31,9 +31,9 @@ header('Content-Type: text/html; charset=utf-8');
 setlocale( LC_ALL, 'pt_BR', 'pt_BR.iso-8859-1', 'pt_BR.utf-8', 'portuguese' );
 
 // ------- by xboxslim788@gmail.com --------------
-$TableWidth = 554;
+$TableWidth = 532;
 // item, codigo, nome, quant, valor, desc
-$cwidth = array(8,10,50,10,14,8);
+$cwidth = array(8,10,40,10,18,14);
 
 class YOURPDF extends TCPDF {
 
@@ -339,7 +339,7 @@ function listaprodutos($idpedido, $item)
   $celula_Litem = ' style="font-weight: normal;
 				text-align:center;
 				padding:3px;
-				
+				height: 50px;
 				color:#000;
 				width:'.$cwidth[0] .'%;
 				vertical-align:middle;"';
@@ -348,7 +348,7 @@ function listaprodutos($idpedido, $item)
   $celula_Lcodigo = ' style="font-weight: normal;
 				text-align: center;
 				padding: 3px;
-				
+				height: 50px;
 				color:#000;
 				width:'.$cwidth[1] .'%;
 				vertical-align: middle;"';    
@@ -357,7 +357,7 @@ function listaprodutos($idpedido, $item)
   $celula_Lnome = ' style="font-weight: normal;
 				text-align: left;
 				padding:3px;
-				
+				height: 50px;
 				color:#000;
 				width:'.$cwidth[2] .'%;
 				vertical-align:middle;"';
@@ -365,7 +365,7 @@ function listaprodutos($idpedido, $item)
   $celula_Lquant = ' style="font-weight: normal;
 				text-align: center;
 				padding: 3px;
-				
+				height: 50px;
 				color:#000;
 				width:'.$cwidth[3] .'%;
 				vertical-align: middle;"';
@@ -373,7 +373,7 @@ function listaprodutos($idpedido, $item)
   $celula_Lvalor = ' style="font-weight: normal;
 				text-align: right;
 				padding:3px;
-				
+				height: 50px;
 				color:#000;
 				width:'.$cwidth[4] .'%;
 				vertical-align:middle;"';
@@ -381,7 +381,7 @@ function listaprodutos($idpedido, $item)
    $celula_Ldesc = ' style="font-weight: normal;
 				text-align: center;
 				padding: 3px;
-				
+				height: 50px;
 				color:#000;
 				width:'.$cwidth[5] .'%;
 				vertical-align: middle;"';  
@@ -578,7 +578,7 @@ inner join C001_PESSOAS as C1 on G3.IDCLIENTE = C1.ID inner join G001_FORMAPAGTO
 				width:20%;
 				vertical-align: middle;"';  
   
-  $celula_L1parc = ' style="font-weight: bold;
+  $celula_L1parc = ' style="
 				text-align: center;
 				padding: 3px;
 				
@@ -594,7 +594,7 @@ inner join C001_PESSOAS as C1 on G3.IDCLIENTE = C1.ID inner join G001_FORMAPAGTO
 				width:20%;
 				vertical-align: middle;"';  
   
-  $celula_L1venc = ' style="font-weight: bold;
+  $celula_L1venc = ' style="
 				text-align: center;
 				padding: 3px;
 				
@@ -610,7 +610,7 @@ inner join C001_PESSOAS as C1 on G3.IDCLIENTE = C1.ID inner join G001_FORMAPAGTO
 				width:20%;
 				vertical-align: middle;"';  
   
-  $celula_L1valor = ' style="font-weight: bold;
+  $celula_L1valor = ' style="
 				text-align: center;
 				padding: 3px;
 				
@@ -713,7 +713,7 @@ inner join C001_PESSOAS as C1 on G3.IDCLIENTE = C1.ID inner join G001_FORMAPAGTO
   }
     $fhtml .= '<tr style="border-bottom:1px #000 solid; background-color:#003366; color:#fff; font-weight:bold; font-size: 14px;">
 					<td colspan="2" align="center" class="borda esq">TOTAL R$</td>
-					<td style="padding:5px; text-align:right;">'.number_format($t, 2, ',', ' ').'</td>
+					<td style="padding:5px; text-align:center;">'.number_format($t, 2, ',', ' ').'</td>
 				  </tr>';
    $fhtml .= '</table></div>';
     
