@@ -32,8 +32,8 @@ setlocale( LC_ALL, 'pt_BR', 'pt_BR.iso-8859-1', 'pt_BR.utf-8', 'portuguese' );
 
 // ------- by xboxslim788@gmail.com --------------
 $TableWidth = 532;
-// item, codigo, nome, quant, valor, desc
-$cwidth = array(8,10,40,10,18,14);
+// item, codigo, nome, quant, valor, desc, valor unit
+$cwidth = array(8,10,40,10,18,14,19);
 
 class YOURPDF extends TCPDF {
 
@@ -376,7 +376,8 @@ function listaprodutos($idpedido, $item)
 				height: 50px;
 				color:#000;
 				width:'.$cwidth[4] .'%;
-				vertical-align:middle;"';
+				vertical-align:middle;"';  
+  
   
    $celula_Ldesc = ' style="font-weight: normal;
 				text-align: center;
@@ -385,6 +386,14 @@ function listaprodutos($idpedido, $item)
 				color:#000;
 				width:'.$cwidth[5] .'%;
 				vertical-align: middle;"';  
+  
+  $celula_Lvalorunit = ' style="font-weight: normal;
+				text-align: center;
+				padding:3px;
+				height: 50px;
+				color:#000;
+				width:'.$cwidth[6] .'%;
+				vertical-align:middle;"';
   
   
  
@@ -395,7 +404,7 @@ function listaprodutos($idpedido, $item)
           <td' .$celula_Lcodigo . '>'.$codigo[$x].'</td>
 					<td' .$celula_Lnome .'>' .utf8_encode($produto[$x]).'</td>
           <td' .$celula_Lquant . '>'.$quantidade[$x].'</td>
-          <td' .$celula_Lvalor .'>R$ ' .number_format($vlrunit[$x],2,",",".").'</td>
+          <td' .$celula_Lvalorunit .'>R$ ' .number_format($vlrunit[$x],2,",",".").'</td>
           <td' .$celula_Ldesc . '>'.$descgeral[$x].'</td>
           <td' .$celula_Lvalor .'>R$ ' .number_format($vlsubtotal[$x],2,",",".").'</td>
 				</tr>';
@@ -570,6 +579,14 @@ inner join C001_PESSOAS as C1 on G3.IDCLIENTE = C1.ID inner join G001_FORMAPAGTO
 				width:'.$cwidth[5] .'%;
 				vertical-align: middle;"';
   
+   $celula_Tvalorunit = ' style="font-weight: bold;
+				text-align:center;
+				padding:3px;
+				background-color:#003366;
+				color:#fff;
+				width:'.$cwidth[6] .'%;
+				vertical-align:middle;"';
+  
   $celula_T1parc = ' style="font-weight: bold;
 				text-align: center;
 				padding: 3px;
@@ -639,7 +656,7 @@ inner join C001_PESSOAS as C1 on G3.IDCLIENTE = C1.ID inner join G001_FORMAPAGTO
           <td' .$celula_Tcodigo .'>CÓDIGO </td>
           <td' .$celula_Tnome .'>DESCRIÇÃO</td>
           <td' .$celula_Tquant .'>QUANT. </td>	
-          <td' .$celula_Tvalor .'>UNIT.R$</td>
+          <td' .$celula_Tvalorunit .'>UNIT.R$</td>
           <td' .$celula_Tdesc .'>DESC. </td>
 					<td' .$celula_Tvalor .'>SUBTOTAL R$</td>
 				  </tr>';    
